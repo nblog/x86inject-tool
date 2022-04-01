@@ -1,0 +1,129 @@
+LIBRARY User-Bridge
+EXPORTS
+	KbLoadAsDriver
+	KbLoadAsFilter
+	KbUnload
+	KbGetDriverApiVersion
+	KbGetUserApiVersion
+	KbGetHandlesCount
+
+	KbSetBeeperRegime
+	KbStartBeeper
+	KbStopBeeper
+	KbSetBeeperIn
+	KbSetBeeperOut
+	KbSetBeeperDivider
+	KbSetBeeperFrequency
+
+	KbReadPortByte
+	KbReadPortWord
+	KbReadPortDword
+	KbReadPortByteString
+	KbReadPortWordString
+	KbReadPortDwordString
+	KbWritePortByte
+	KbWritePortWord
+	KbWritePortDword
+	KbWritePortByteString
+	KbWritePortWordString
+	KbWritePortDwordString
+
+	KbRaiseIopl
+	KbResetIopl
+
+	KbCli
+	KbSti
+	KbHlt
+
+	KbReadMsr
+	KbWriteMsr
+
+	KbCpuid
+	KbCpuidEx
+
+	KbReadPmc
+	KbReadTsc
+	KbReadTscp
+
+	KbAllocKernelMemory
+	KbFreeKernelMemory
+	KbAllocNonCachedMemory
+	KbFreeNonCachedMemory
+	KbCopyMoveMemory
+	KbFillMemory
+	KbEqualMemory
+
+	KbAllocateMdl
+	KbProbeAndLockPages
+	KbMapMdl
+	KbProtectMappedMemory
+	KbUnmapMdl
+	KbUnlockPages
+	KbFreeMdl
+	KbMapMemory
+	KbUnmapMemory
+	
+	KbAllocPhysicalMemory
+	KbFreePhysicalMemory
+	KbMapPhysicalMemory
+	KbUnmapPhysicalMemory
+	KbGetPhysicalAddress
+	KbGetVirtualForPhysical
+	KbReadPhysicalMemory
+	KbWritePhysicalMemory
+	KbReadDmiMemory
+
+	KbGetEprocess
+	KbGetEthread
+	KbOpenProcess
+	KbOpenProcessByPointer
+	KbOpenThread
+	KbOpenThreadByPointer
+	KbDereferenceObject
+	KbCloseHandle
+	KbQueryInformationProcess
+	KbSetInformationProcess
+	KbQueryInformationThread
+	KbSetInformationThread
+	KbCreateUserThread
+	KbCreateSystemThread
+	KbSuspendProcess
+	KbResumeProcess
+	KbGetThreadContext
+	KbSetThreadContext
+	KbAllocUserMemory
+	KbFreeUserMemory
+	KbSecureVirtualMemory
+	KbUnsecureVirtualMemory
+	KbReadProcessMemory
+	KbWriteProcessMemory
+	KbGetProcessCr3Cr4
+	KbQueueUserApc
+
+	KbCreateSection
+	KbOpenSection
+	KbMapViewOfSection
+	KbUnmapViewOfSection
+
+	KbExecuteShellCode
+
+	KbCreateDriver
+	KbLoadModule
+	KbUnloadModule
+	KbGetModuleHandle
+	KbCallModule
+
+	KbRtlMapDriverMemory
+	KbRtlMapDriverFile
+	KbRtlLoadModuleMemory
+	KbRtlLoadModuleFile
+
+    KbVmmEnable
+    KbVmmDisable
+	KbVmmInterceptPage
+	KbVmmDeinterceptPage
+
+	KbGetKernelProcAddress
+	KbStallExecutionProcessor
+	KbBugCheck
+	KbFindSignature

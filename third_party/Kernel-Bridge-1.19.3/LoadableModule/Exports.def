@@ -1,0 +1,5 @@
+NAME LoadableModule
+EXPORTS
+	OnLoad
+	OnUnload
+	OnDeviceControl
