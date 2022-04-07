@@ -26,6 +26,7 @@
 ## Credits
 - [asmjit_xedparse](https://github.com/x64dbg/asmjit_xedparse)
 - [Kernel-Bridge](https://github.com/HoShiMin/Kernel-Bridge)
+- [BlackBone](https://github.com/DarthTon/Blackbone)
 
 ## Compile
 Visual Studio 2022 (C++/CLI)
