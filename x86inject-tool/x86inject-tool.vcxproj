@@ -81,7 +81,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Blackbone\src;$(SolutionDir)third_party\Kernel-Bridge-1.19.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Kernel-Bridge-1.19.3;$(SolutionDir)third_party\Blackbone\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -96,7 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Blackbone\src;$(SolutionDir)third_party\Kernel-Bridge-1.19.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Kernel-Bridge-1.19.3;$(SolutionDir)third_party\Blackbone\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -111,7 +111,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Blackbone\src;$(SolutionDir)third_party\Kernel-Bridge-1.19.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Kernel-Bridge-1.19.3;$(SolutionDir)third_party\Blackbone\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -126,7 +126,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Blackbone\src;$(SolutionDir)third_party\Kernel-Bridge-1.19.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\XEDParse;$(SolutionDir)third_party\Kernel-Bridge-1.19.3;$(SolutionDir)third_party\Blackbone\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -193,6 +193,11 @@
     <EmbeddedResource Include="frmProcesses.resx">
       <DependentUpon>frmProcesses.h</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\third_party\Blackbone\src\BlackBone\BlackBone.vcxproj">
+      <Project>{a2c53563-46f5-4d87-903f-3f1f2fdb2deb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

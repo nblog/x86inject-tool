@@ -3,9 +3,25 @@
 ## Features
 - **x86 and x64 support**
 - **User and Kernel (Kernel-Bridge) support**
-- **[c-comments](https://docs.microsoft.com/zh-cn/cpp/c-language/c-comments)**
 - **Strings support ( "" or L"" or u8"" )**
-- **import [WIP]**
+- **[Run-Time Dynamic Linking](https://docs.microsoft.com/zh-cn/windows/win32/dlls/run-time-dynamic-linking)**
+- **[c-comments](https://docs.microsoft.com/zh-cn/cpp/c-language/c-comments)**
+
+## Examples 32bit
+
+    /* this is example (32bit) */
+    push L"example.dll"
+    call [kernel32.LoadLibraryW]
+    ret
+
+## Examples 64bit
+
+    /* this is example (64bit) */
+    sub rsp, 0x28
+    mov rcx, L"example.dll"
+    call [kernel32.LoadLibraryW]
+    add rsp, 0x28
+    ret
 
 ## Credits
 - [asmjit_xedparse](https://github.com/x64dbg/asmjit_xedparse)

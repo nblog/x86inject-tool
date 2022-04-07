@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "x86inject-tool", "x86inject-tool\x86inject-tool.vcxproj", "{705C1662-CCC1-4B83-B389-14B14E18ABC0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlackBone", "third_party\Blackbone\src\BlackBone\BlackBone.vcxproj", "{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{705C1662-CCC1-4B83-B389-14B14E18ABC0}.Release|x64.Build.0 = Release|x64
 		{705C1662-CCC1-4B83-B389-14B14E18ABC0}.Release|x86.ActiveCfg = Release|Win32
 		{705C1662-CCC1-4B83-B389-14B14E18ABC0}.Release|x86.Build.0 = Release|Win32
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Debug|x64.ActiveCfg = Debug|x64
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Debug|x64.Build.0 = Debug|x64
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Debug|x86.ActiveCfg = Debug|Win32
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Debug|x86.Build.0 = Debug|Win32
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Release|x64.ActiveCfg = Release|x64
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Release|x64.Build.0 = Release|x64
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Release|x86.ActiveCfg = Release|Win32
+		{A2C53563-46F5-4D87-903F-3F1F2FDB2DEB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

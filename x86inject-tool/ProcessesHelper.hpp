@@ -2,12 +2,11 @@
 
 
 #include <Windows.h>
-#include <Winternl.h>
 #include <Psapi.h>
 #include <tlhelp32.h>
 #pragma comment(lib, "ntdll")
 
-EXTERN_C CONST IMAGE_DOS_HEADER __ImageBase;
+//EXTERN_C CONST IMAGE_DOS_HEADER __ImageBase;
 
 
 
@@ -24,6 +23,30 @@ EXTERN_C CONST IMAGE_DOS_HEADER __ImageBase;
 
 #include "ProcessWrapper.hpp"
 
+
+
+
+// http://www.isthe.com/chongo/tech/comp/fnv
+namespace fnv {
+	constexpr uint32_t offsetBasis = 0x811c9dc5;
+	constexpr uint32_t prime = 0x1000193;
+
+	constexpr uint32_t hash(const unsigned char* str, size_t length, const uint32_t value = offsetBasis) noexcept
+	{
+		return length ? hash(str + 1, length - 1, (value ^ *str) * static_cast<unsigned long long>(prime)) : value;
+	}
+
+	constexpr uint32_t hashRuntime(const char* str) noexcept
+	{
+		auto value = offsetBasis;
+
+		while (*str) {
+			value ^= *str++;
+			value *= prime;
+		}
+		return value;
+	}
+}
 
 
 
@@ -76,8 +99,8 @@ namespace x86injecttool {
 	std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
 
 
-	struct clsAssembleJit
-	{
+	struct clsAssembleJit {
+
 	public:
 		const ptr_t baseAddr() { return symbols()["base_addr"]; };
 		const ptr_t execAddr() { return symbols()["wrapper_addr"]; };
@@ -102,6 +125,9 @@ namespace x86injecttool {
 
 			ptr_t retAddr = 0; 
 			buildCode().append((const char *)(&retAddr), is64 ? 8 : 4);
+
+			Callback<bool(const char*, ULONGLONG*)>::func = std::bind(&clsAssembleJit::sym_resolver, this, std::placeholders::_1, std::placeholders::_2);
+			_sym_resolver_addr = static_cast<CBXEDPARSE_UNKNOWN>(Callback<bool(const char*, ULONGLONG*)>::callback);
 		};
 
 
@@ -121,7 +147,7 @@ namespace x86injecttool {
 
 			for (int i = 0; i < contents->Count; i++) {
 				if (!assembler(marshal_as<std::string>(contents[i]))) {
-					_lastErr = "[line: " + std::to_string(i + 1) + "]: " + _lastErr;
+					_lastErr = "[line: \"" + marshal_as<std::string>(contents[i]) + "\"]: \n" + _lastErr;
 					return false;
 				}
 			}
@@ -166,11 +192,9 @@ namespace x86injecttool {
 			memcpy(parse.instr, content.data(), content.length());
 
 			//
-			Callback<bool(const char*, ULONGLONG*)>::func = std::bind(&clsAssembleJit::sym_resolver, this, std::placeholders::_1, std::placeholders::_2);
-			parse.cbUnknown = static_cast<CBXEDPARSE_UNKNOWN>(Callback<bool(const char*, ULONGLONG*)>::callback);
-
 			parse.x64 = bool(is64); 
 			parse.cip = baseAddr() + buildCode().length();
+			parse.cbUnknown = _sym_resolver_addr;
 
 			if (XEDPARSE_STATUS::XEDPARSE_OK == XEDParseAssemble(&parse)) {
 				buildCode().append((const char*)(parse.dest), size_t(parse.dest_size));
@@ -185,14 +209,16 @@ namespace x86injecttool {
 		void label(const std::string l, ptr_t r=0) { symbols()[l] = r ? r : (baseAddr() + buildCode().length()); }
 
 
-
 		bool is64;
 		std::string _makeCode, _lastErr;
 		std::unordered_map<std::string, ptr_t> _symbol_table;
+		CBXEDPARSE_UNKNOWN _sym_resolver_addr;
 	};
 
 
 	struct clsProcessesHelper {
+
+	public:
 
 		static \
 			inline bool is64exec(fs::path exec)

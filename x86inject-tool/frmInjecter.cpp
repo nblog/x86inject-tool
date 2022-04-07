@@ -14,7 +14,7 @@ namespace x86injecttool {
 	inline System::Void frmInjecter::frmInjecter_Load(System::Object^ sender, System::EventArgs^ e) {
 
 		fs::path kernelDrv = x86injecttool::current_path() / L"Kernel-Bridge.sys";
-		if (fs::exists(kernelDrv)) KbLoader::KbLoadAsDriver(kernelDrv.c_str());
+		if (fs::exists(kernelDrv)) KbLoader::KbLoadAsDriver(kernelDrv.wstring().c_str());
 
 		return;
 	}
@@ -35,18 +35,16 @@ namespace x86injecttool {
 
 		m_txt_allocaddr->Text = ""; m_txt_resultvalue->Text = "";
 
-		const size_t pageSize = 4096;
+		clsUserProcessWrapper process(processes.target.processId);
 
-		clsUserProcessWrapper process(processes.target.processId, processes.target.processb64);
-
-		clsAssembleJit asmjit(process.is64(), process.virtual_alloc(pageSize, true));
+		clsAssembleJit asmjit(process.process_64(), process.virtual_alloc(process.pagelength(), true));
 
 		std::string codeBuffer = std::string();
 
 
-		// .rdata
+		// .idata
 		Dictionary<String^, IntPtr>^ importsTable = gcnew Dictionary<String^, IntPtr>();
-		// .data
+		// .rdata
 		Dictionary<String^, array<Byte>^>^ stringsTable = gcnew Dictionary<String^, array<Byte>^>();
 		// .code
 		List<String^>^ codesTable = gcnew List<String^>();
@@ -63,41 +61,59 @@ namespace x86injecttool {
 
 			if (String::Empty == s) continue;
 
-			String^ content = String::Empty; String^ m = String::Empty;
+
 			System::Text::Encoding^ coder = System::Text::Encoding::Default;
+			String^ c = String::Empty; String^ m = String::Empty;
+			Boolean matched = false;
+
+
+			// https://docs.microsoft.com/en-us/windows/win32/dlls/run-time-dynamic-linking
+			matched = String::Empty != (m = Regex::Match(s, "\\[.*?\\]")->Value);
+
+			if (m->StartsWith("[") && m->EndsWith("]")) {
+				c = m->Substring(1, m->Length - 2);
+			}
+
+			if (matched) {
+				String^ module_name = c->Substring(0, c->LastIndexOf('.'));
+				String^ module_function = c->Substring(c->LastIndexOf('.') + 1);
+
+				ptr_t fnPtr = process.get_proc_address(
+					process.get_module_handle(marshal_as<std::wstring>(module_name)), marshal_as<std::string>(module_function)
+				);
+
+				if (fnPtr) {
+					auto label = String::Format("l{0:x}", fnv::hashRuntime(marshal_as<std::string>(c).c_str()));
+					importsTable[label] = IntPtr( int64_t(fnPtr) );
+
+					s = s->Replace(c, label);
+				}
+			}
 
 			// https://docs.microsoft.com/zh-cn/cpp/c-language/c-string-literals
 			// https://zh.cppreference.com/w/cpp/language/string_literal
-			m = Regex::Match(s, "(u8\".*\")|(L\".*\")|(\".*\")")->Value;
+			matched = String::Empty != (m = Regex::Match(s, "(u8\".*\")|(L\".*\")|(\".*\")")->Value);
+
 			if (m->StartsWith("\"")) {
 				coder = System::Text::Encoding::Default;
-				content = m->Substring(1, m->Length - 2);
-
-				stringsTable[m] = coder->GetBytes(content);
+				c = m->Substring(1, m->Length - 2);
 			}
 			else if (m->StartsWith("L\"")) {
 				coder = System::Text::Encoding::Unicode;
-				content = m->Substring(2, m->Length - 3);
-
-				stringsTable[m] = coder->GetBytes(content);
+				c = m->Substring(2, m->Length - 3);
 			}
 			else if (m->StartsWith("u8\"")) {
 				coder = System::Text::Encoding::UTF8;
-				content = m->Substring(3, m->Length - 4);
-
-				stringsTable[m] = coder->GetBytes(content);
+				c = m->Substring(3, m->Length - 4);
 			}
 
-			//m = Regex::Match(s, "\\[.*?\\]")->Value;
-			//if (m->StartsWith("[") && m->EndsWith("]")) {
-			//	content = m->Substring(1, m->Length - 2);
+			if (matched) {
+				auto label = String::Format("l{0:x}", fnv::hashRuntime(marshal_as<std::string>(m).c_str()));
+				stringsTable[label] = coder->GetBytes(c);
 
-			//	auto mm = content->Split('.');
-			//	if (2 == mm->Length) {
-			//		auto fnPtr = process.get_proc_address( process.get_module_handle(""), "" );
-			//		if (fnPtr) importsTable->Add(content, IntPtr(intptr_t(fnPtr)));
-			//	}
-			//}
+				s = s->Replace(m, label);
+			}
+
 
 			//
 			codesTable->Add(s);
@@ -121,22 +137,29 @@ namespace x86injecttool {
 		}
 
 		codeBuffer = asmjit.makeCode();
-		if (codeBuffer.empty() || pageSize < codeBuffer.length()) {
-			MessageBox::Show("make code failed.", "error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		if (codeBuffer.empty() || process.pagelength() < codeBuffer.length()) {
+			MessageBox::Show("failed to make code.", "error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 			goto _cleanup;
 		}
 		
-		process.write_memory(asmjit.baseAddr(), (ptr_t)(codeBuffer.data()), (ptr_t)(codeBuffer.length()));
+		if (!process.write_memory(asmjit.baseAddr(), codeBuffer.data(), codeBuffer.length())) {
+			MessageBox::Show("failed to write shellcode.", "error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			goto _cleanup;
+		}
 
 		ptr_t result = 0;
 		{
 			ptr_t threadId = 0;
 
-			process.create_thread(threadId, asmjit.execAddr());
+			if (!process.create_thread(threadId, asmjit.execAddr()) || !threadId) {
+				MessageBox::Show("failed to create thread.", "error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				goto _cleanup;
+			}
 
 			process.wait_for_thread(threadId);
 
-			result = process.read_pointer(asmjit.resultAddr());
+			result = process.process_64() ? process.read_memory_t<uint64_t>(asmjit.resultAddr())
+				: process.read_memory_t<uint32_t>(asmjit.resultAddr());
 		}
 
 		m_txt_allocaddr->Text = String::Format("{0:X16}", asmjit.baseAddr());

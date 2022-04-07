@@ -199,6 +199,7 @@ namespace x86injecttool {
 			this->Controls->Add(this->btn_processes);
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
 			this->Name = L"frmInjecter";
+			this->Text = L"x86inject-tool";
 			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &frmInjecter::frmInjecter_FormClosed);
 			this->Load += gcnew System::EventHandler(this, &frmInjecter::frmInjecter_Load);
 			this->ResumeLayout(false);
